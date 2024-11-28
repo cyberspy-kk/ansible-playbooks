@@ -1,0 +1,66 @@
+---
+- name: Stop Unnecessary Services to Reduce Attack Vectors
+  hosts: all
+  become: true  # Run tasks with elevated privileges
+
+  tasks:
+    - name: List currently running services
+      command: systemctl list-units --type=service --state=running
+      register: running_services
+      changed_when: false
+
+    - name: Stop telnet service if running
+      service:
+        name: telnet
+        state: stopped
+      when: "'telnet.service' in running_services.stdout"
+
+    - name: Stop ftp service if running
+      service:
+        name: vsftpd
+        state: stopped
+      when: "'vsftpd.service' in running_services.stdout"
+
+    - name: Stop rpcbind service if running
+      service:
+        name: rpcbind
+        state: stopped
+      when: "'rpcbind.service' in running_services.stdout"
+
+    - name: Stop nfs server service if running
+      service:
+        name: nfs-server
+        state: stopped
+      when: "'nfs-server.service' in running_services.stdout"
+
+    - name: Stop avahi-daemon service if running
+      service:
+        name: avahi-daemon
+        state: stopped
+      when: "'avahi-daemon.service' in running_services.stdout"
+
+    - name: Stop samba service if running
+      service:
+        name: smbd
+        state: stopped
+      when: "'smbd.service' in running_services.stdout"
+
+    - name: Disable unnecessary services to prevent starting on boot
+      service:
+        name: "{{ item }}"
+        enabled: no
+      loop:
+        - telnet
+        - vsftpd
+        - rpcbind
+        - nfs-server
+        - avahi-daemon
+        - smbd
+      when: "'telnet.service' in running_services.stdout or 
+             'vsftpd.service' in running_services.stdout or 
+             'rpcbind.service' in running_services.stdout or 
+             'nfs-server.service' in running_services.stdout or 
+             'avahi-daemon.service' in running_services.stdout or 
+             'smbd.service' in running_services.stdout"
+
+

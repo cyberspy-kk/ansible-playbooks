@@ -1,0 +1,40 @@
+---
+- name: Secure SSH on Ubuntu
+  hosts: all
+  become: true  # Run tasks with elevated privileges
+
+  tasks:
+    - name: Ensure the SSH package is installed
+      apt:
+        name: openssh-server
+        state: present
+
+    - name: Restrict root login in SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PermitRootLogin'
+        line: 'PermitRootLogin no'
+        state: present
+        create: true
+
+    - name: Disable password authentication for SSH
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^PasswordAuthentication'
+        line: 'PasswordAuthentication no'
+        state: present
+        create: true
+
+    - name: Set maximum failed login attempts
+      lineinfile:
+        path: /etc/ssh/sshd_config
+        regexp: '^MaxAuthTries'
+        line: 'MaxAuthTries 2'
+        state: present
+        create: true
+
+    - name: Restart SSH service to apply changes
+      service:
+        name: ssh
+        state: restarted
+
