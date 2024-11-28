@@ -1,0 +1,29 @@
+---
+- name: Enable UFW with Default Deny Rules and Allow SSH
+  hosts: all
+  become: true  # Run tasks with elevated privileges
+
+  tasks:
+    - name: Install UFW if not installed
+      apt:
+        name: ufw
+        state: present
+
+    - name: Enable UFW with default deny rules
+      ufw:
+        state: enabled
+        policy: deny  # Deny all incoming traffic by default
+
+    - name: Allow incoming SSH connections
+      ufw:
+        rule: allow
+        name: OpenSSH  # Allow SSH connections (port 22)
+
+    - name: Enable UFW to start on boot
+      systemd:
+        name: ufw
+        enabled: yes
+
+    - name: Reload UFW to apply changes
+      command: ufw reload
+

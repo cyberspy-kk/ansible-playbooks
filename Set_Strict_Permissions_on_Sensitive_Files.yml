@@ -1,0 +1,48 @@
+---
+- name: Set Strict Permissions on Sensitive Files (/etc/passwd and /etc/shadow)
+  hosts: all
+  become: true  # Run tasks with elevated privileges
+
+  tasks:
+    - name: Set correct permissions on /etc/passwd
+      file:
+        path: /etc/passwd
+        owner: root
+        group: root
+        mode: '0644'  # Readable by all users but only writable by root
+      register: passwd_permission_change
+
+    - name: Set correct permissions on /etc/shadow
+      file:
+        path: /etc/shadow
+        owner: root
+        group: shadow
+        mode: '0600'  # Readable and writable only by root and shadow group
+      register: shadow_permission_change
+
+    - name: Verify permissions of /etc/passwd
+      stat:
+        path: /etc/passwd
+      register: passwd_permissions
+
+    - name: Verify permissions of /etc/shadow
+      stat:
+        path: /etc/shadow
+      register: shadow_permissions
+
+    - name: Display permission change status for /etc/passwd
+      debug:
+        msg: "Change made to /etc/passwd: {{ passwd_permission_change }}"
+
+    - name: Display permission change status for /etc/shadow
+      debug:
+        msg: "Change made to /etc/shadow: {{ shadow_permission_change }}"
+
+    - name: Display permissions of /etc/passwd
+      debug:
+        msg: "Permissions of /etc/passwd: {{ passwd_permissions.stat.mode }}"
+
+    - name: Display permissions of /etc/shadow
+      debug:
+        msg: "Permissions of /etc/shadow: {{ shadow_permissions.stat.mode }}"
+

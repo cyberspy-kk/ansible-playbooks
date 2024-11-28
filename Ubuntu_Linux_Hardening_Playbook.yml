@@ -1,0 +1,14 @@
+---
+- name: Update and Upgrade Ubuntu System
+  hosts: all
+  become: true  # Run tasks with elevated privileges
+
+  tasks:
+    - name: Update the apt package cache
+      apt:
+        update_cache: yes
+
+    - name: Upgrade all packages to the latest version
+      apt:
+        upgrade: dist
+
