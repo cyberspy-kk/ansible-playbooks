@@ -10,10 +10,6 @@
         name: ufw
         state: present
 
-    # Enable and start UFW firewall
-    - name: Enable UFW firewall
-      command: ufw enable
-
     # Allow only SSH connection through UFW
     - name: Allow SSH connection
       command: ufw allow OpenSSH
@@ -22,12 +18,17 @@
     - name: Block all other incoming traffic
       command: ufw default deny incoming
 
+    # Install Neovim
+    - name: Install Neovim
+      apt:
+        name: neovim
+        state: present
+
     # Install PostgreSQL
     - name: Install PostgreSQL
       apt:
         name: postgresql
         state: present
-        update_cache: yes
 
     # Start PostgreSQL service
     - name: Start PostgreSQL service
@@ -36,39 +37,10 @@
         state: started
         enabled: true
 
-    # Set password for the 'postgres' user using command
-    - name: Set PostgreSQL postgres user password
-      command: "sudo -u postgres psql -c \"ALTER USER postgres WITH PASSWORD 'securepassword';\""
-
-    # Allow remote access to PostgreSQL (optional, modify as needed)
-    - name: Allow remote access for PostgreSQL
-      lineinfile:
-        path: /etc/postgresql/*/main/pg_hba.conf
-        regexp: '^host'
-        line: 'host    all             all             0.0.0.0/0            md5'
-
-    # Ensure PostgreSQL is listening on all IPs
-    - name: Ensure PostgreSQL is listening on all IPs
-      lineinfile:
-        path: /etc/postgresql/*/main/postgresql.conf
-        regexp: '^#listen_addresses ='
-        line: 'listen_addresses = "*"'
-
-    # Restart PostgreSQL to apply configuration changes
-    - name: Restart PostgreSQL service
-      service:
-        name: postgresql
-        state: restarted
-
-    # Install additional tools (curl, vim)
+    # Install curl
     - name: Install curl
       apt:
         name: curl
-        state: present
-
-    - name: Install vim
-      apt:
-        name: vim
         state: present
 
     # Create a sample directory (example task)
