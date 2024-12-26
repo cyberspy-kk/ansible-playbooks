@@ -38,7 +38,7 @@
 
     # Create system user with credentials from Ansible Vault
     - name: Create a system user
-      user:
+      user: kk
         name: "{{ vault_system_user }}"
         password: "{{ vault_system_user_password | password_hash('sha512') }}"
         state: present
