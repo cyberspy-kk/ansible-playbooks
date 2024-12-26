@@ -4,44 +4,77 @@
   become: true
   tasks:
 
+    # Update system package list
+    - name: Update the system package list
+      apt:
+        update_cache: yes
+
+    # Install UFW firewall
     - name: Install UFW firewall
       apt:
         name: ufw
         state: present
 
+    # Allow SSH connection
     - name: Allow SSH connection
       command: ufw allow OpenSSH
 
+    # Block all other incoming traffic
     - name: Block all other incoming traffic
       command: ufw default deny incoming
 
+    # Install Neovim
     - name: Install Neovim
       apt:
         name: neovim
         state: present
 
+    # Install PostgreSQL
     - name: Install PostgreSQL
       apt:
         name: postgresql
         state: present
 
+    # Start PostgreSQL service
     - name: Start PostgreSQL service
       service:
         name: postgresql
         state: started
         enabled: true
 
+    # Install curl
     - name: Install curl
       apt:
         name: curl
         state: present
 
+    # Create a sample directory
     - name: Create a sample directory
       file:
         path: /opt/sample-directory
         state: directory
         mode: '0755'
 
-    - name: Update the system package list
+    # Install fzf
+    - name: Install fzf
       apt:
-        update_cache: yes
+        name: fzf
+        state: present
+
+    # Configure fzf to work with Ctrl+R in bash
+    - name: Configure fzf in Bash
+      lineinfile:
+        path: /etc/bash.bashrc
+        line: |
+          if [[ -f /usr/share/doc/fzf/examples/key-bindings.bash ]]; then
+            source /usr/share/doc/fzf/examples/key-bindings.bash
+          fi
+          export FZF_DEFAULT_COMMAND='find . -type f'
+      create: yes
+
+    # Run fzf installation script (if necessary)
+    - name: Run fzf installation script for bash
+      shell: |
+        /usr/share/doc/fzf/examples/install --key-bindings --completion --no-update-rc
+      args:
+        executable: /bin/bash
