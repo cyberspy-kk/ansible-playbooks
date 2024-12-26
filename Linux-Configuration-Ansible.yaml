@@ -71,9 +71,17 @@
           fi
           export FZF_DEFAULT_COMMAND='find . -type f'
 
-    # Run fzf installation script for bash
-    - name: Run fzf installation script
-      shell: |
-        /usr/share/doc/fzf/examples/install --key-bindings --completion --no-update-rc
-      args:
-        executable: /bin/bash
+    # Install fzf keybindings and completions manually
+    - name: Manually configure fzf keybindings and completions
+      block:
+        - name: Download fzf keybindings and completions
+          get_url:
+            url: https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash
+            dest: /etc/profile.d/fzf-key-bindings.bash
+            mode: '0644'
+
+        - name: Add fzf configuration to bashrc
+          lineinfile:
+            path: /etc/bash.bashrc
+            line: 'source /etc/profile.d/fzf-key-bindings.bash'
+            state: present
