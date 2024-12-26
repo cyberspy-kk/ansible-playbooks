@@ -61,7 +61,7 @@
         name: fzf
         state: present
 
-    # Configure fzf to work with Ctrl+R in bash
+    # Configure fzf in Bash
     - name: Configure fzf in Bash
       lineinfile:
         path: /etc/bash.bashrc
@@ -70,10 +70,9 @@
             source /usr/share/doc/fzf/examples/key-bindings.bash
           fi
           export FZF_DEFAULT_COMMAND='find . -type f'
-      create: yes
 
-    # Run fzf installation script (if necessary)
-    - name: Run fzf installation script for bash
+    # Run fzf installation script for bash
+    - name: Run fzf installation script
       shell: |
         /usr/share/doc/fzf/examples/install --key-bindings --completion --no-update-rc
       args:
