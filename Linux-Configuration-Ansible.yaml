@@ -1,0 +1,95 @@
+---
+- name: Configure newly installed Ubuntu VM
+  hosts: all
+  become: true
+  tasks:
+
+    # Ensure UFW firewall is installed
+    - name: Install UFW firewall
+      apt:
+        name: ufw
+        state: present
+
+    # Enable and start UFW firewall
+    - name: Enable and start UFW firewall
+      service:
+        name: ufw
+        state: started
+        enabled: true
+
+    # Allow only SSH connection through UFW
+    - name: Allow SSH connection
+      ufw:
+        rule: allow
+        name: OpenSSH
+        state: enabled
+
+    # Block all other incoming traffic
+    - name: Block all other incoming traffic
+      ufw:
+        default: deny
+        direction: incoming
+        state: enabled
+
+    # Install PostgreSQL
+    - name: Install PostgreSQL
+      apt:
+        name: postgresql
+        state: present
+
+    # Start and enable PostgreSQL service
+    - name: Start PostgreSQL service
+      service:
+        name: postgresql
+        state: started
+        enabled: true
+
+    # Set password for the 'postgres' user
+    - name: Set PostgreSQL postgres user password
+      postgresql_user:
+        name: postgres
+        password: "securepassword"
+        state: present
+
+    # Allow remote access to PostgreSQL (optional, modify as needed)
+    - name: Allow remote access for PostgreSQL
+      lineinfile:
+        path: /etc/postgresql/*/main/pg_hba.conf
+        regexp: '^host'
+        line: 'host    all             all             0.0.0.0/0            md5'
+
+    # Ensure PostgreSQL is listening on all IPs
+    - name: Ensure PostgreSQL is listening on all IPs
+      lineinfile:
+        path: /etc/postgresql/*/main/postgresql.conf
+        regexp: '^#listen_addresses ='
+        line: 'listen_addresses = "*"'
+
+    # Restart PostgreSQL to apply configuration changes
+    - name: Restart PostgreSQL service
+      service:
+        name: postgresql
+        state: restarted
+
+    # Install additional tools (curl, vim)
+    - name: Install curl
+      apt:
+        name: curl
+        state: present
+
+    - name: Install vim
+      apt:
+        name: vim
+        state: present
+
+    # Create a sample directory (example task)
+    - name: Create a sample directory
+      file:
+        path: /opt/sample-directory
+        state: directory
+        mode: '0755'
+
+    # Ensure the system package list is updated
+    - name: Update the system package list
+      apt:
+        update_cache: yes
