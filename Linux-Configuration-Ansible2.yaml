@@ -1,15 +1,17 @@
-vault_system_user: "john"
-vault_system_user_password: "john@123"
-
-hosts:
-  all:
-    tasks:
-      - name: Adding user
-        user:
-          name: "{{ vault_system_user }}"
-          password: "{{ vault_system_user_password | password_hash('sha512') }}"
-          comment: "John Ben"
-          shell: /bin/bash
-          group: apache
-          createhome: yes
-          home: "/home/{{ vault_system_user }}"
+---
+- name: Create a system user
+  hosts: all
+  become: yes
+  vars:
+    vault_system_user: "john"
+    vault_system_user_password: "john@123"
+  tasks:
+    - name: Add user
+      user:
+        name: "{{ vault_system_user }}"
+        password: "{{ vault_system_user_password | password_hash('sha512') }}"
+        comment: "John Ben"
+        shell: /bin/bash
+        group: apache
+        createhome: yes
+        home: "/home/{{ vault_system_user }}"
