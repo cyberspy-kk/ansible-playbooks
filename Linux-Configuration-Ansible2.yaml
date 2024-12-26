@@ -1,16 +1,58 @@
-$ANSIBLE_VAULT;1.1;AES256
-34386366323236343931373465373663303139643463316535303939303961626662353333643262
-3033363436613738386639306532666633333131316432650a663538366436383365303365666666
-61633161353430373738613361373363626166393235313865323635633864353438396636323464
-3834343239666339350a343361643631363432326430353861613762613939653830393863356264
-65366465313164636665353264373365336138616636393932373739616265383563326232393436
-34653332353736613733306561373736323036613434336534386566316130386435303665656363
-33323732316465383636363463393235303662653631643935653139366564393665333265366365
-63643532386135353961666438383163303364656438393733666237376263313963616337393763
-63643566363938653065626430373135643462623735303866323539373230343438643265646263
-38666437343931643033343561333933396639393936333339653239653664323466366435366263
-35636534626230366330316439306361376665376635306163646331386662313939303835353139
-61353834356432323966343034336230663535633838306561666339383066336639636661303961
-39653233326166383165623433343933386234383566373933656562336564373063396536313132
-32346639313362646364373835646462346536336132666464336561333539343061613338363464
-383132386462323966386466333531306633
+---
+- name: Configure newly installed Ubuntu VM
+  hosts: all
+  become: true
+  tasks:
+
+    # Ensure UFW firewall is installed
+    - name: Install UFW firewall
+      apt:
+        name: ufw
+        state: present
+
+    # Allow only SSH connection through UFW
+    - name: Allow SSH connection
+      command: ufw allow OpenSSH
+
+    # Block all other incoming traffic
+    - name: Block all other incoming traffic
+      command: ufw default deny incoming
+
+    # Install Neovim
+    - name: Install Neovim
+      apt:
+        name: neovim
+        state: present
+
+    # Install curl
+    - name: Install curl
+      apt:
+        name: curl
+        state: present
+
+    # Install PostgreSQL
+    - name: Install PostgreSQL
+      apt:
+        name: postgresql
+        state: present
+
+    # Create system user with credentials from Ansible Vault
+    - name: Create a system user
+      user:
+        name: "{{ vault_system_user }}"
+        password: "{{ vault_system_user_password | password_hash('sha512') }}"
+        state: present
+        shell: /bin/bash
+        comment: "System User created from Ansible Vault"
+
+    # Create a sample directory (example task)
+    - name: Create a sample directory
+      file:
+        path: /opt/sample-directory
+        state: directory
+        mode: '0755'
+
+    # Ensure the system package list is updated
+    - name: Update the system package list
+      apt:
+        update_cache: yes
