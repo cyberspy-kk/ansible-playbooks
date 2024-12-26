@@ -77,7 +77,7 @@
         name: curl
         state: present
 
-    - name: Install vim
+    - name: Install nvim
       apt:
         name: vim
         state: present
