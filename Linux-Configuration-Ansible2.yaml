@@ -36,14 +36,14 @@
         name: postgresql
         state: present
 
-    # Create system user with credentials from Ansible Vault
-    - name: Create a system user
-      user: kk2
-        name: "{{ vault_system_user }}"
+    # Create system user kk2 with credentials from Ansible Vault
+    - name: Create system user kk2
+      user:
+        name: "kk2"
         password: "{{ vault_system_user_password | password_hash('sha512') }}"
         state: present
         shell: /bin/bash
-        comment: "System User created from Ansible Vault"
+        comment: "System User kk2 created from Ansible Vault"
 
     # Create a sample directory (example task)
     - name: Create a sample directory
