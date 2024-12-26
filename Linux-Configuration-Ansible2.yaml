@@ -6,6 +6,11 @@
     vault_system_user: "john"
     vault_system_user_password: "john@123"
   tasks:
+    - name: Ensure apache group exists
+      group:
+        name: apache
+        state: present
+
     - name: Add user
       user:
         name: "{{ vault_system_user }}"
