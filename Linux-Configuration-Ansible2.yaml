@@ -1,22 +1,10 @@
 ---
-- name: Create a system user
+- name: Create user kk
   hosts: all
   become: yes
-  vars:
-    vault_system_user: "john"
-    vault_system_user_password: "john@123"
   tasks:
-    - name: Ensure apache group exists
-      group:
-        name: apache
-        state: present
-
-    - name: Add user
+    - name: Create user kk
       user:
-        name: "{{ vault_system_user }}"
-        password: "{{ vault_system_user_password | password_hash('sha512') }}"
-        comment: "John Ben"
-        shell: /bin/bash
-        group: apache
-        createhome: yes
-        home: "/home/{{ vault_system_user }}"
+        name: kk
+        password: "{{ 'password' | password_hash('sha512') }}"
+        state: present
