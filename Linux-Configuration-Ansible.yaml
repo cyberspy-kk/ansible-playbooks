@@ -28,12 +28,27 @@
         name: postgresql
         state: present
 
-    # Start and enable PostgreSQL service
+    # Start PostgreSQL service
     - name: Start PostgreSQL service
       service:
         name: postgresql
         state: started
         enabled: true
+      ignore_errors: true  # Ignore errors in case the service name is different
+
+    # Find the correct PostgreSQL service name
+    - name: Get PostgreSQL service name
+      command: systemctl list-units --type=service | grep postgresql
+      register: postgresql_service
+      changed_when: false
+      failed_when: false
+
+    - name: Start correct PostgreSQL service
+      service:
+        name: "{{ postgresql_service.stdout_lines[0] }}"
+        state: started
+        enabled: true
+      when: postgresql_service.stdout_lines
 
     # Set password for the 'postgres' user using command
     - name: Set PostgreSQL postgres user password
@@ -56,8 +71,9 @@
     # Restart PostgreSQL to apply configuration changes
     - name: Restart PostgreSQL service
       service:
-        name: postgresql
+        name: "{{ postgresql_service.stdout_lines[0] }}"
         state: restarted
+      when: postgresql_service.stdout_lines
 
     # Install additional tools (curl, vim)
     - name: Install curl
