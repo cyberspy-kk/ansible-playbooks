@@ -4,46 +4,38 @@
   become: true
   tasks:
 
-    # Ensure UFW firewall is installed
     - name: Install UFW firewall
       apt:
         name: ufw
         state: present
 
-    # Allow only SSH connection through UFW
     - name: Allow SSH connection
       command: ufw allow OpenSSH
 
-    # Block all other incoming traffic
     - name: Block all other incoming traffic
       command: ufw default deny incoming
 
-    # Install Neovim
     - name: Install Neovim
       apt:
         name: neovim
         state: present
 
-    # Install PostgreSQL
     - name: Install PostgreSQL
       apt:
         name: postgresql
         state: present
 
-    # Start PostgreSQL service
     - name: Start PostgreSQL service
       service:
         name: postgresql
         state: started
         enabled: true
 
-    # Install curl
     - name: Install curl
       apt:
         name: curl
         state: present
 
-    # Create a sample directory (example task)
     - name: Create a sample directory
       file:
         path: /opt/sample-directory
