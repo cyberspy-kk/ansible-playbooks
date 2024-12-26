@@ -11,25 +11,16 @@
         state: present
 
     # Enable and start UFW firewall
-    - name: Enable and start UFW firewall
-      service:
-        name: ufw
-        state: started
-        enabled: true
+    - name: Enable UFW firewall
+      command: ufw enable
 
     # Allow only SSH connection through UFW
     - name: Allow SSH connection
-      ufw:
-        rule: allow
-        name: OpenSSH
-        state: enabled
+      command: ufw allow OpenSSH
 
     # Block all other incoming traffic
     - name: Block all other incoming traffic
-      ufw:
-        default: deny
-        direction: incoming
-        state: enabled
+      command: ufw default deny incoming
 
     # Install PostgreSQL
     - name: Install PostgreSQL
@@ -77,7 +68,7 @@
         name: curl
         state: present
 
-    - name: Install nvim
+    - name: Install vim
       apt:
         name: vim
         state: present
