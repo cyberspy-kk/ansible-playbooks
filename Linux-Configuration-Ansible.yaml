@@ -55,21 +55,24 @@
         state: directory
         mode: '0755'
 
-    # Clone fzf repository
+
+- name: Clone, install, and configure fzf
+  hosts: all
+  become: false  # Run as the current user
+  tasks:
+
     - name: Clone fzf repository
       git:
         repo: https://github.com/junegunn/fzf.git
         dest: "{{ ansible_env.HOME }}/.fzf"
         depth: 1
 
-    # Run fzf installation script
     - name: Run fzf installation script
       shell: "{{ ansible_env.HOME }}/.fzf/install --key-bindings --completion --no-update-rc"
       args:
         executable: /bin/bash
 
-    # Add fzf to shell rc
-    - name: Add fzf configuration to shell rc
+    - name: Add fzf to shell rc
       lineinfile:
         path: "{{ ansible_env.HOME }}/.bashrc"  # Adjust if using another shell (e.g., .zshrc)
         line: |
@@ -77,7 +80,6 @@
           [ -f "{{ ansible_env.HOME }}/.fzf.bash" ] && source "{{ ansible_env.HOME }}/.fzf.bash"
         create: yes
 
-    # Source .bashrc to apply the changes
     - name: Source .bashrc to apply the changes
       shell: source {{ ansible_env.HOME }}/.bashrc
       args:
