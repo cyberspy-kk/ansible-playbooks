@@ -55,33 +55,30 @@
         state: directory
         mode: '0755'
 
-    # Install fzf
-    - name: Install fzf
-      apt:
-        name: fzf
-        state: present
+    # Clone fzf repository
+    - name: Clone fzf repository
+      git:
+        repo: https://github.com/junegunn/fzf.git
+        dest: "{{ ansible_env.HOME }}/.fzf"
+        depth: 1
 
-    # Configure fzf in Bash
-    - name: Configure fzf in Bash
+    # Run fzf installation script
+    - name: Run fzf installation script
+      shell: "{{ ansible_env.HOME }}/.fzf/install --key-bindings --completion --no-update-rc"
+      args:
+        executable: /bin/bash
+
+    # Add fzf to shell rc
+    - name: Add fzf configuration to shell rc
       lineinfile:
-        path: /etc/bash.bashrc
+        path: "{{ ansible_env.HOME }}/.bashrc"  # Adjust if using another shell (e.g., .zshrc)
         line: |
-          if [[ -f /usr/share/doc/fzf/examples/key-bindings.bash ]]; then
-            source /usr/share/doc/fzf/examples/key-bindings.bash
-          fi
-          export FZF_DEFAULT_COMMAND='find . -type f'
+          # Enable fzf keybindings
+          [ -f "{{ ansible_env.HOME }}/.fzf.bash" ] && source "{{ ansible_env.HOME }}/.fzf.bash"
+        create: yes
 
-    # Install fzf keybindings and completions manually
-    - name: Manually configure fzf keybindings and completions
-      block:
-        - name: Download fzf keybindings and completions
-          get_url:
-            url: https://raw.githubusercontent.com/junegunn/fzf/master/shell/key-bindings.bash
-            dest: /etc/profile.d/fzf-key-bindings.bash
-            mode: '0644'
-
-        - name: Add fzf configuration to bashrc
-          lineinfile:
-            path: /etc/bash.bashrc
-            line: 'source /etc/profile.d/fzf-key-bindings.bash'
-            state: present
+    # Source .bashrc to apply the changes
+    - name: Source .bashrc to apply the changes
+      shell: source {{ ansible_env.HOME }}/.bashrc
+      args:
+        executable: /bin/bash
